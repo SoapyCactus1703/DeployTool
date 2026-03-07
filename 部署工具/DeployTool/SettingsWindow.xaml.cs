@@ -200,6 +200,11 @@ exit
             MessageBox.Show($"清理失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
+    private void Window_ManipulationBoundaryFeedback(object sender, System.Windows.Input.ManipulationBoundaryFeedbackEventArgs e)
+    {
+        e.Handled = true;
+    }
 }
 
 public class FlagItem

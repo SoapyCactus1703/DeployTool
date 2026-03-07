@@ -1,4 +1,4 @@
-﻿﻿<Window x:Class="DeployTool.MainWindow"
+<Window x:Class="DeployTool.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DeployTool.ViewModels"
@@ -6,7 +6,8 @@
         Title="西林民高部署工具"
         WindowStartupLocation="CenterScreen"
         Background="#F0F4F8"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        ManipulationBoundaryFeedback="Window_ManipulationBoundaryFeedback">
     
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>

@@ -13,7 +13,7 @@ public static class AppSettings
     public static double CpuTempWarningThreshold { get; set; } = 80.0;
     public static NetworkPreset? NetworkPreset { get; set; }
     
-    public static string GitHubRepo { get; set; } = "SoapyCactus1703/DeployTool";
+    public static string GiteeRepo { get; set; } = "soapycactus1703SoapyCactus1703/DeployTool";
     
     public static Dictionary<string, bool> TaskFlags { get; set; } = new();
     
@@ -63,11 +63,11 @@ public static class AppSettings
                     AutoSyncTime = settings.AutoSyncTime;
                     CpuTempWarningThreshold = settings.CpuTempWarningThreshold > 0 ? settings.CpuTempWarningThreshold : 80.0;
                     TaskFlags = settings.TaskFlags ?? new Dictionary<string, bool>();
-                    GitHubRepo = settings.GitHubRepo ?? "YOUR_USERNAME/YOUR_REPO";
+                    GiteeRepo = settings.GiteeRepo ?? "soapycactus1703SoapyCactus1703/DeployTool";
                 }
             }
             
-            UpdateService.Instance.SetGitHubRepo(GitHubRepo);
+            UpdateService.Instance.SetGiteeRepo(GiteeRepo);
         }
         catch { }
     }
@@ -90,7 +90,7 @@ public static class AppSettings
                 AutoSyncTime = AutoSyncTime,
                 CpuTempWarningThreshold = CpuTempWarningThreshold,
                 TaskFlags = TaskFlags,
-                GitHubRepo = GitHubRepo
+                GiteeRepo = GiteeRepo
             };
             var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(SettingsFilePath, json);
@@ -135,7 +135,7 @@ public class AppSettingsData
     public bool AutoSyncTime { get; set; } = true;
     public double CpuTempWarningThreshold { get; set; } = 80.0;
     public Dictionary<string, bool> TaskFlags { get; set; } = new();
-    public string GitHubRepo { get; set; } = "YOUR_USERNAME/YOUR_REPO";
+    public string GiteeRepo { get; set; } = "soapycactus1703SoapyCactus1703/DeployTool";
 }
 
 public class NetworkPreset

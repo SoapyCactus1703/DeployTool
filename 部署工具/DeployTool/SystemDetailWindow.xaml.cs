@@ -291,6 +291,11 @@ public partial class SystemDetailWindow : Window
             canvas.Children.Add(dot);
         }
     }
+
+    private void Window_ManipulationBoundaryFeedback(object sender, System.Windows.Input.ManipulationBoundaryFeedbackEventArgs e)
+    {
+        e.Handled = true;
+    }
 }
 
 public class SystemDetailViewModel : System.ComponentModel.INotifyPropertyChanged

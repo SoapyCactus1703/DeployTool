@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Windows;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using DeployTool.Models;
@@ -225,5 +225,10 @@ public partial class MainWindow : Window
         _cpuTempTimer.Stop();
         _logScrollTimer.Stop();
         base.OnClosed(e);
+    }
+
+    private void Window_ManipulationBoundaryFeedback(object sender, System.Windows.Input.ManipulationBoundaryFeedbackEventArgs e)
+    {
+        e.Handled = true;
     }
 }

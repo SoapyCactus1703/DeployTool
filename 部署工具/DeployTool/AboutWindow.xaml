@@ -5,7 +5,8 @@
         Height="320" Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#F0F4F8">
+        Background="#F0F4F8"
+        ManipulationBoundaryFeedback="Window_ManipulationBoundaryFeedback">
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,7 +18,7 @@
             <Image x:Name="AuthorAvatar" Width="64" Height="64" Margin="0,0,16,0"/>
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="西林民高部署工具" FontSize="18" FontWeight="Bold" Foreground="#1E3A5F"/>
-                <TextBlock Text="v12.2.0 正式版" FontSize="12" Foreground="#718096" Margin="0,4,0,0"/>
+                <TextBlock Text="v13.0.0 正式版" FontSize="12" Foreground="#718096" Margin="0,4,0,0"/>
             </StackPanel>
         </StackPanel>
 

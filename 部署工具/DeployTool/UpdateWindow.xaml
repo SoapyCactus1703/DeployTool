@@ -8,7 +8,8 @@
         AllowsTransparency="True"
         WindowStyle="None"
         BorderBrush="#3182CE"
-        BorderThickness="2">
+        BorderThickness="2"
+        ManipulationBoundaryFeedback="Window_ManipulationBoundaryFeedback">
     <Border CornerRadius="8" Background="#F0F4F8">
         <Grid Margin="24">
             <Grid.RowDefinitions>

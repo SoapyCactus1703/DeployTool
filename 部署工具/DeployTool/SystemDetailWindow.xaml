@@ -6,7 +6,8 @@
         WindowStartupLocation="CenterOwner"
         Background="#F0F4F8"
         ResizeMode="CanResize"
-        MinHeight="700" MinWidth="1000">
+        MinHeight="700" MinWidth="1000"
+        ManipulationBoundaryFeedback="Window_ManipulationBoundaryFeedback">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

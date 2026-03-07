@@ -15,7 +15,8 @@ public class UpdateService
     public static UpdateService Instance => _instance.Value;
 
     private readonly HttpClient _httpClient;
-    private string _githubRepo = "SoapyCactus1703/DeployTool";
+    private string _giteeRepo = "soapycactus1703SoapyCactus1703/DeployTool";
+    private const string ApiBaseUrl = "https://gitee.com/api/v5";
     
     public string CurrentVersion { get; }
     public string DownloadUrl { get; private set; } = "";
@@ -36,18 +37,18 @@ public class UpdateService
         CurrentVersion = version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "1.0.0";
     }
 
-    public void SetGitHubRepo(string repo)
+    public void SetGiteeRepo(string repo)
     {
-        _githubRepo = repo;
+        _giteeRepo = repo;
     }
 
     public async Task<UpdateInfo?> CheckForUpdateAsync()
     {
         try
         {
-            var url = $"https://api.github.com/repos/{_githubRepo}/releases/latest";
+            var url = $"{ApiBaseUrl}/repos/{_giteeRepo}/releases/latest";
             var response = await _httpClient.GetStringAsync(url);
-            var release = JsonSerializer.Deserialize<GitHubRelease>(response);
+            var release = JsonSerializer.Deserialize<GiteeRelease>(response);
             
             if (release == null || release.Assets == null)
                 return null;
@@ -299,14 +300,15 @@ exit
 
     public void OpenReleasePage()
     {
-        if (!string.IsNullOrEmpty(UpdateInfoUrl))
+        var url = !string.IsNullOrEmpty(UpdateInfoUrl) 
+            ? UpdateInfoUrl 
+            : $"https://gitee.com/{_giteeRepo}/releases";
+        
+        Process.Start(new ProcessStartInfo
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = UpdateInfoUrl,
-                UseShellExecute = true
-            });
-        }
+            FileName = url,
+            UseShellExecute = true
+        });
     }
 
     public bool HasOldBackup()
@@ -347,7 +349,7 @@ public class DownloadProgressEventArgs : EventArgs
     public double ProgressPercentage { get; set; }
 }
 
-internal class GitHubRelease
+internal class GiteeRelease
 {
     [JsonPropertyName("tag_name")]
     public string? TagName { get; set; }
@@ -365,10 +367,10 @@ internal class GitHubRelease
     public DateTime? PublishedAt { get; set; }
     
     [JsonPropertyName("assets")]
-    public List<GitHubAsset>? Assets { get; set; }
+    public List<GiteeAsset>? Assets { get; set; }
 }
 
-internal class GitHubAsset
+internal class GiteeAsset
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

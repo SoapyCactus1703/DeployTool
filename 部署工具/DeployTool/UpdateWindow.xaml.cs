@@ -289,4 +289,14 @@ public partial class UpdateWindow : Window
         _downloadCts?.Dispose();
         base.OnClosed(e);
     }
+
+    private void Window_ManipulationBoundaryFeedback(object sender, System.Windows.Input.ManipulationBoundaryFeedbackEventArgs e)
+    {
+        e.Handled = true;
+    }
+
+    public void SetGiteeRepo(string repo)
+    {
+        _updateService.SetGiteeRepo(repo);
+    }
 }

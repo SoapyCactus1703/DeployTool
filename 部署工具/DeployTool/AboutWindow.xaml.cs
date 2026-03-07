@@ -39,4 +39,9 @@ public partial class AboutWindow : Window
     {
         Close();
     }
+
+    private void Window_ManipulationBoundaryFeedback(object sender, System.Windows.Input.ManipulationBoundaryFeedbackEventArgs e)
+    {
+        e.Handled = true;
+    }
 }
