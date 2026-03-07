@@ -79,108 +79,188 @@ public class MainViewModel : INotifyPropertyChanged
         {
             new TopMenuItem
             {
-                Id = 1, Name = "教学部署",
+                Id = 1, Name = "流程部署",
                 MenuItems = new List<MenuItem>
                 {
-                    new MenuItem { Id = 11, Name = "标准教学环境 (改名seewo)", Description = "安装seewo相关软件，更改用户名为seewo，激活系统", ConfirmMessage = "即将执行【标准教学环境部署】：\n\n1. 将 Administrator 重命名为 seewo\n2. 安装 .NET SDK\n3. 安装显卡驱动（自动检测CPU代数）\n4. 安装 seewo 教学应用\n5. 安装办公应用\n6. 安装 360 极速浏览器X\n7. 激活系统与 Office\n8. 执行系统优化\n\n此操作可能需要较长时间，确定继续吗？", TaskIds = new List<int> { 101, 301, 302, 401, 402, 404, 501, 502 } },
-                    new MenuItem { Id = 12, Name = "标准教学环境 (带迁移)", Description = "安装seewo相关软件，迁移用户文件夹到D盘", ConfirmMessage = "即将执行【标准教学环境部署（带迁移）】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 安装 .NET SDK\n4. 安装显卡驱动\n5. 安装 seewo 教学应用\n6. 安装办公应用\n7. 安装 360 极速浏览器X\n8. 激活系统与 Office\n9. 执行系统优化\n\n注意：迁移用户文件夹需要 D 盘存在！\n确定继续吗？", TaskIds = new List<int> { 612, 613, 301, 302, 401, 402, 404, 501, 502 } },
-                    new MenuItem { Id = 13, Name = "完整教学环境", Description = "改名seewo + 迁移用户文件夹 + 完整部署", ConfirmMessage = "即将执行【完整教学环境部署】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 将 Administrator 重命名为 seewo\n4. 安装 .NET SDK\n5. 安装显卡驱动\n6. 安装 seewo 教学应用\n7. 安装办公应用\n8. 安装 360 极速浏览器X\n9. 激活系统与 Office\n10. 执行系统优化\n\n这是最完整的部署流程，确定继续吗？", TaskIds = new List<int> { 612, 613, 101, 301, 302, 401, 402, 404, 501, 502 } }
+                    new MenuItem 
+                    { 
+                        Id = 101, Name = "教学部署", Description = "教学环境部署方案",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 11, Name = "标准教学环境 (改名seewo)", Description = "安装seewo相关软件，更改用户名为seewo，激活系统", ConfirmMessage = "即将执行【标准教学环境部署】：\n\n1. 将 Administrator 重命名为 seewo\n2. 安装 .NET SDK\n3. 安装显卡驱动（自动检测CPU代数）\n4. 安装 seewo 教学应用\n5. 安装办公应用\n6. 安装 360 极速浏览器X\n7. 激活系统与 Office\n8. 执行系统优化\n\n此操作可能需要较长时间，确定继续吗？", TaskIds = new List<int> { 101, 301, 302, 401, 402, 404, 501, 502 } },
+                            new MenuItem { Id = 12, Name = "标准教学环境 (带迁移)", Description = "安装seewo相关软件，迁移用户文件夹到D盘", ConfirmMessage = "即将执行【标准教学环境部署（带迁移）】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 安装 .NET SDK\n4. 安装显卡驱动\n5. 安装 seewo 教学应用\n6. 安装办公应用\n7. 安装 360 极速浏览器X\n8. 激活系统与 Office\n9. 执行系统优化\n\n注意：迁移用户文件夹需要 D 盘存在！\n确定继续吗？", TaskIds = new List<int> { 612, 613, 301, 302, 401, 402, 404, 501, 502 } },
+                            new MenuItem { Id = 13, Name = "完整教学环境", Description = "改名seewo + 迁移用户文件夹 + 完整部署", ConfirmMessage = "即将执行【完整教学环境部署】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 将 Administrator 重命名为 seewo\n4. 安装 .NET SDK\n5. 安装显卡驱动\n6. 安装 seewo 教学应用\n7. 安装办公应用\n8. 安装 360 极速浏览器X\n9. 激活系统与 Office\n10. 执行系统优化\n\n这是最完整的部署流程，确定继续吗？", TaskIds = new List<int> { 612, 613, 101, 301, 302, 401, 402, 404, 501, 502 } }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 102, Name = "办公部署", Description = "办公环境部署方案",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 21, Name = "基础办公环境", Description = "安装办公软件、输入法、安全软件", ConfirmMessage = "即将执行【基础办公环境部署】：\n\n1. 安装办公应用（Apps2 目录）\n2. 安装搜狗输入法\n3. 安装 360 极速浏览器X\n4. 激活系统与 Office\n5. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 402, 403, 404, 501, 502 } },
+                            new MenuItem { Id = 22, Name = "基础办公 (带迁移)", Description = "安装办公软件，迁移用户文件夹", ConfirmMessage = "即将执行【基础办公环境部署（带迁移）】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 安装办公应用\n4. 安装 360 极速浏览器X\n5. 激活系统与 Office\n6. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 612, 613, 402, 404, 501, 502 } },
+                            new MenuItem { Id = 23, Name = "精简办公环境", Description = "仅安装基础办公软件", ConfirmMessage = "即将执行【精简办公环境部署】：\n\n1. 安装办公应用\n2. 安装 360 极速浏览器X\n3. 激活系统与 Office\n4. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 402, 404, 501, 502 } }
+                        }
+                    }
                 }
             },
             new TopMenuItem
             {
-                Id = 2, Name = "办公部署",
+                Id = 2, Name = "系统优化",
                 MenuItems = new List<MenuItem>
                 {
-                    new MenuItem { Id = 21, Name = "基础办公环境", Description = "安装办公软件、输入法、安全软件", ConfirmMessage = "即将执行【基础办公环境部署】：\n\n1. 安装办公应用（Apps2 目录）\n2. 安装搜狗输入法\n3. 安装 360 极速浏览器X\n4. 激活系统与 Office\n5. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 402, 403, 404, 501, 502 } },
-                    new MenuItem { Id = 22, Name = "基础办公 (带迁移)", Description = "安装办公软件，迁移用户文件夹", ConfirmMessage = "即将执行【基础办公环境部署（带迁移）】：\n\n1. 迁移用户文件夹到 D 盘\n2. 重启资源管理器\n3. 安装办公应用\n4. 安装 360 极速浏览器X\n5. 激活系统与 Office\n6. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 612, 613, 402, 404, 501, 502 } },
-                    new MenuItem { Id = 23, Name = "精简办公环境", Description = "仅安装基础办公软件", ConfirmMessage = "即将执行【精简办公环境部署】：\n\n1. 安装办公应用\n2. 安装 360 极速浏览器X\n3. 激活系统与 Office\n4. 执行系统优化\n\n确定继续吗？", TaskIds = new List<int> { 402, 404, 501, 502 } }
+                    new MenuItem 
+                    { 
+                        Id = 201, Name = "优化套餐", Description = "一键优化方案",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 31, Name = "快速优化套餐", Description = "执行安全的快速优化", ConfirmMessage = "即将执行【快速优化套餐】：\n\n1. 清理临时文件和系统缓存\n2. 根据磁盘类型执行 TRIM 或碎片整理\n3. 切换到高性能电源计划\n4. 关闭休眠、禁用 SuperFetch\n5. 优化网络设置\n\n确定继续吗？", TaskId = 701 },
+                            new MenuItem { Id = 32, Name = "完整优化套餐", Description = "执行全面的系统优化", ConfirmMessage = "即将执行【完整优化套餐】：\n\n1. 清理临时文件\n2. 磁盘性能优化\n3. 高性能模式\n4. 性能优化调整\n5. 系统服务优化\n6. 移除预装应用\n7. 网络优化\n8. 隐私设置调整\n9. 安全加固\n10. UAC 优化\n11. BIOS 优化\n12. 游戏模式增强\n\n确定继续吗？", TaskId = 702 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 202, Name = "磁盘与性能", Description = "磁盘清理与性能优化",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 33, Name = "磁盘清理", Description = "清理临时文件、系统缓存", ConfirmMessage = "即将执行【磁盘清理】：\n\n清理以下位置的临时文件：\n- Windows 临时文件夹\n- 用户临时文件夹\n- Windows Update 缓存\n\n确定继续吗？", TaskId = 601 },
+                            new MenuItem { Id = 34, Name = "磁盘性能优化", Description = "根据磁盘类型执行TRIM或碎片整理", ConfirmMessage = "即将执行【磁盘性能优化】：\n\n自动检测系统盘类型：\n- SSD：执行 TRIM 优化\n- HDD：执行碎片整理\n\n确定继续吗？", TaskId = 602 },
+                            new MenuItem { Id = 35, Name = "高性能模式", Description = "切换到高性能电源计划", ConfirmMessage = "即将执行【高性能模式】：\n\n将电源计划切换为【高性能】模式，\n以获得最佳系统性能。\n\n确定继续吗？", TaskId = 604 },
+                            new MenuItem { Id = 36, Name = "性能优化调整", Description = "关闭搜索索引、SuperFetch等服务", ConfirmMessage = "即将执行【性能优化调整】：\n\n1. 关闭系统休眠\n2. 禁用 Windows Search 服务\n3. 禁用 SuperFetch/SysMain 服务\n4. 优化内存管理设置\n\n确定继续吗？", TaskId = 605 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 203, Name = "系统服务", Description = "服务与隐私设置",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 37, Name = "系统服务优化", Description = "禁用不必要的后台服务", ConfirmMessage = "即将执行【系统服务优化】：\n\n将禁用以下服务：\n- Fax（传真服务）\n- 地理位置服务\n- 地图下载服务\n- 分布式链接跟踪\n- 平板电脑输入服务\n\n确定继续吗？", TaskId = 607 },
+                            new MenuItem { Id = 38, Name = "移除预装应用", Description = "清理Microsoft预装应用", ConfirmMessage = "即将执行【移除预装应用】：\n\n将移除以下 Microsoft 预装应用：\n- Bing 新闻\n- Xbox 相关应用\n- Skype\n- 获取帮助\n- 开始菜单\n\n确定继续吗？", TaskId = 610 },
+                            new MenuItem { Id = 39, Name = "网络优化", Description = "优化TCP参数和DNS缓存", ConfirmMessage = "即将执行【网络优化】：\n\n1. 优化 TCP/IP 参数\n2. 清除 DNS 缓存\n\n确定继续吗？", TaskId = 617 },
+                            new MenuItem { Id = 310, Name = "隐私设置调整", Description = "禁用诊断数据和活动历史", ConfirmMessage = "即将执行【隐私设置调整】：\n\n1. 禁用 Windows 遥测\n2. 禁用活动历史记录\n\n确定继续吗？", TaskId = 618 },
+                            new MenuItem { Id = 311, Name = "安全加固", Description = "禁用SMBv1和LLMNR", ConfirmMessage = "即将执行【安全加固】：\n\n1. 禁用 SMBv1 协议（防止勒索病毒）\n2. 禁用 LLMNR（防止 DNS 欺骗）\n\n确定继续吗？", TaskId = 619 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 204, Name = "时间设置", Description = "NTP时间同步",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 312, Name = "设置NTP服务器", Description = "设置NTP服务器为国家授时中心", ConfirmMessage = "即将执行【设置NTP服务器】：\n\n将 NTP 服务器设置为：\n" + AppSettings.NtpServer + "\n\n并启用自动时间同步服务。\n确定继续吗？", TaskId = 720 },
+                            new MenuItem { Id = 313, Name = "立即同步时间", Description = "立即同步系统时间", ConfirmMessage = "即将执行【立即同步时间】：\n\n将立即从 NTP 服务器同步系统时间。\n\n确定继续吗？", TaskId = 721 }
+                        }
+                    }
                 }
             },
             new TopMenuItem
             {
-                Id = 3, Name = "系统优化",
+                Id = 3, Name = "软件与驱动",
                 MenuItems = new List<MenuItem>
                 {
-                    new MenuItem { Id = 31, Name = "快速优化套餐", Description = "执行安全的快速优化", ConfirmMessage = "即将执行【快速优化套餐】：\n\n1. 清理临时文件和系统缓存\n2. 根据磁盘类型执行 TRIM 或碎片整理\n3. 切换到高性能电源计划\n4. 关闭休眠、禁用 SuperFetch\n5. 优化网络设置\n\n确定继续吗？", TaskId = 701 },
-                    new MenuItem { Id = 32, Name = "完整优化套餐", Description = "执行全面的系统优化", ConfirmMessage = "即将执行【完整优化套餐】：\n\n1. 清理临时文件\n2. 磁盘性能优化\n3. 高性能模式\n4. 性能优化调整\n5. 系统服务优化\n6. 移除预装应用\n7. 网络优化\n8. 隐私设置调整\n9. 安全加固\n10. UAC 优化\n11. BIOS 优化\n12. 游戏模式增强\n\n确定继续吗？", TaskId = 702 },
-                    new MenuItem { Id = 33, Name = "磁盘清理", Description = "清理临时文件、系统缓存", ConfirmMessage = "即将执行【磁盘清理】：\n\n清理以下位置的临时文件：\n- Windows 临时文件夹\n- 用户临时文件夹\n- Windows Update 缓存\n\n确定继续吗？", TaskId = 601 },
-                    new MenuItem { Id = 34, Name = "磁盘性能优化", Description = "根据磁盘类型执行TRIM或碎片整理", ConfirmMessage = "即将执行【磁盘性能优化】：\n\n自动检测系统盘类型：\n- SSD：执行 TRIM 优化\n- HDD：执行碎片整理\n\n确定继续吗？", TaskId = 602 },
-                    new MenuItem { Id = 35, Name = "高性能模式", Description = "切换到高性能电源计划", ConfirmMessage = "即将执行【高性能模式】：\n\n将电源计划切换为【高性能】模式，\n以获得最佳系统性能。\n\n确定继续吗？", TaskId = 604 },
-                    new MenuItem { Id = 36, Name = "性能优化调整", Description = "关闭搜索索引、SuperFetch等服务", ConfirmMessage = "即将执行【性能优化调整】：\n\n1. 关闭系统休眠\n2. 禁用 Windows Search 服务\n3. 禁用 SuperFetch/SysMain 服务\n4. 优化内存管理设置\n\n确定继续吗？", TaskId = 605 },
-                    new MenuItem { Id = 37, Name = "系统服务优化", Description = "禁用不必要的后台服务", ConfirmMessage = "即将执行【系统服务优化】：\n\n将禁用以下服务：\n- Fax（传真服务）\n- 地理位置服务\n- 地图下载服务\n- 分布式链接跟踪\n- 平板电脑输入服务\n\n确定继续吗？", TaskId = 607 },
-                    new MenuItem { Id = 38, Name = "移除预装应用", Description = "清理Microsoft预装应用", ConfirmMessage = "即将执行【移除预装应用】：\n\n将移除以下 Microsoft 预装应用：\n- Bing 新闻\n- Xbox 相关应用\n- Skype\n- 获取帮助\n- 开始菜单\n\n确定继续吗？", TaskId = 610 },
-                    new MenuItem { Id = 39, Name = "网络优化", Description = "优化TCP参数和DNS缓存", ConfirmMessage = "即将执行【网络优化】：\n\n1. 优化 TCP/IP 参数\n2. 清除 DNS 缓存\n\n确定继续吗？", TaskId = 617 },
-                    new MenuItem { Id = 310, Name = "隐私设置调整", Description = "禁用诊断数据和活动历史", ConfirmMessage = "即将执行【隐私设置调整】：\n\n1. 禁用 Windows 遥测\n2. 禁用活动历史记录\n\n确定继续吗？", TaskId = 618 },
-                    new MenuItem { Id = 311, Name = "安全加固", Description = "禁用SMBv1和LLMNR", ConfirmMessage = "即将执行【安全加固】：\n\n1. 禁用 SMBv1 协议（防止勒索病毒）\n2. 禁用 LLMNR（防止 DNS 欺骗）\n\n确定继续吗？", TaskId = 619 },
-                    new MenuItem { Id = 312, Name = "设置NTP服务器", Description = "设置NTP服务器为国家授时中心", ConfirmMessage = "即将执行【设置NTP服务器】：\n\n将 NTP 服务器设置为：\n" + AppSettings.NtpServer + "\n\n并启用自动时间同步服务。\n确定继续吗？", TaskId = 720 },
-                    new MenuItem { Id = 313, Name = "立即同步时间", Description = "立即同步系统时间", ConfirmMessage = "即将执行【立即同步时间】：\n\n将立即从 NTP 服务器同步系统时间。\n\n确定继续吗？", TaskId = 721 }
+                    new MenuItem 
+                    { 
+                        Id = 301, Name = "驱动安装", Description = "安装系统驱动",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 41, Name = "安装显卡驱动", Description = "根据CPU代数自动选择并安装显卡驱动", ConfirmMessage = "即将执行【安装显卡驱动】：\n\n将根据 CPU 代数自动选择驱动：\n- 7-10 代 CPU：gfx_win_101.2137.exe\n- 11-14 代 CPU：gfx_win_101.7076.exe\n\n安装完成后可能需要重启系统。\n确定继续吗？", TaskId = 302 },
+                            new MenuItem { Id = 42, Name = "安装 .NET SDK", Description = "安装 .NET 运行时与开发工具包", ConfirmMessage = "即将执行【安装 .NET SDK】：\n\n从 Appx 目录安装 .NET SDK 运行时。\n\n确定继续吗？", TaskId = 301 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 302, Name = "教学软件", Description = "安装教学相关软件",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 51, Name = "安装seewo教学应用", Description = "静默安装 Apps/ 下所有 .exe 应用", ConfirmMessage = "即将执行【安装 seewo 教学应用】：\n\n将静默安装 Apps 目录下所有 .exe 应用程序。\n\n确定继续吗？", TaskId = 401 },
+                            new MenuItem { Id = 56, Name = "安装希沃白板5", Description = "从 Appx/ 安装希沃白板5", ConfirmMessage = "即将执行【安装希沃白板5】：\n\n从 Appx 目录安装希沃白板5。\n\n确定继续吗？", TaskId = 406 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 303, Name = "办公软件", Description = "安装办公相关软件",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 52, Name = "安装办公应用", Description = "静默安装 Apps2/ 下所有 .exe 应用", ConfirmMessage = "即将执行【安装办公应用】：\n\n将静默安装 Apps2 目录下所有 .exe 应用程序。\n\n确定继续吗？", TaskId = 402 },
+                            new MenuItem { Id = 53, Name = "安装搜狗输入法", Description = "从 Appx/ 安装搜狗输入法", ConfirmMessage = "即将执行【安装搜狗输入法】：\n\n从 Appx 目录安装搜狗输入法。\n\n确定继续吗？", TaskId = 403 },
+                            new MenuItem { Id = 54, Name = "安装360极速浏览器X", Description = "静默安装360极速浏览器X", ConfirmMessage = "即将执行【安装 360 极速浏览器X】：\n\n静默安装 360 极速浏览器X。\n\n确定继续吗？", TaskId = 404 },
+                            new MenuItem { Id = 55, Name = "安装360安全卫士", Description = "从 Appx/ 安装360安全卫士极速版", ConfirmMessage = "即将执行【安装 360 安全卫士】：\n\n从 Appx 目录安装 360 安全卫士极速版。\n\n确定继续吗？", TaskId = 405 }
+                        }
+                    }
                 }
             },
             new TopMenuItem
             {
-                Id = 4, Name = "驱动管理",
+                Id = 4, Name = "网络与用户",
                 MenuItems = new List<MenuItem>
                 {
-                    new MenuItem { Id = 41, Name = "安装显卡驱动", Description = "根据CPU代数自动选择并安装显卡驱动", ConfirmMessage = "即将执行【安装显卡驱动】：\n\n将根据 CPU 代数自动选择驱动：\n- 7-10 代 CPU：gfx_win_101.2137.exe\n- 11-14 代 CPU：gfx_win_101.7076.exe\n\n安装完成后可能需要重启系统。\n确定继续吗？", TaskId = 302 },
-                    new MenuItem { Id = 42, Name = "安装 .NET SDK", Description = "安装 .NET 运行时与开发工具包", ConfirmMessage = "即将执行【安装 .NET SDK】：\n\n从 Appx 目录安装 .NET SDK 运行时。\n\n确定继续吗？", TaskId = 301 }
+                    new MenuItem 
+                    { 
+                        Id = 401, Name = "网络设置", Description = "IP和DNS配置",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 91, Name = "自动获取IP地址", Description = "设置网卡为DHCP自动获取IP", ConfirmMessage = "即将执行【自动获取IP地址】：\n\n将所有活动网卡设置为 DHCP 自动获取 IP 地址。\n\n确定继续吗？", TaskId = 801 },
+                            new MenuItem { Id = 92, Name = "自动获取DNS", Description = "设置DNS为自动获取", ConfirmMessage = "即将执行【自动获取DNS】：\n\n将所有活动网卡的 DNS 设置为自动获取。\n\n确定继续吗？", TaskId = 802 },
+                            new MenuItem { Id = 93, Name = "手动设置IP地址", Description = "手动指定IP地址、子网掩码、网关", ConfirmMessage = "INPUT_IP", TaskId = 803 },
+                            new MenuItem { Id = 94, Name = "手动设置DNS", Description = "手动指定首选和备用DNS", ConfirmMessage = "INPUT_DNS", TaskId = 804 },
+                            new MenuItem { Id = 95, Name = "使用预设网络配置", Description = "应用设置中保存的网络预设", ConfirmMessage = "即将执行【使用预设网络配置】：\n\n将应用设置中保存的网络预设配置。\n\n确定继续吗？", TaskId = 805 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 402, Name = "用户管理", Description = "用户账户设置",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 61, Name = "更改用户名为 seewo", Description = "将 Administrator 重命名为 seewo", ConfirmMessage = "即将执行【更改用户名为 seewo】：\n\n将 Administrator 账户重命名为 seewo。\n\n注意：此操作需要重启系统后生效！\n确定继续吗？", TaskId = 101 },
+                            new MenuItem { Id = 62, Name = "自定义用户名", Description = "输入新的用户名进行重命名", ConfirmMessage = "INPUT", TaskId = 102 },
+                            new MenuItem { Id = 63, Name = "迁移用户文件夹", Description = "将用户文件夹迁移到D盘", ConfirmMessage = "即将执行【迁移用户文件夹】：\n\n将以下文件夹迁移到 D:\\User\\用户名：\n- 文档\n- 下载\n- 音乐\n- 图片\n- 视频\n- 桌面\n\n注意：此操作需要 D 盘存在！\n迁移后需要重启资源管理器生效。\n确定继续吗？", TaskId = 612 },
+                            new MenuItem { Id = 64, Name = "重启资源管理器", Description = "重启资源管理器使迁移生效", ConfirmMessage = "即将执行【重启资源管理器】：\n\n将重启 Windows 资源管理器，\n使用户文件夹迁移生效。\n\n确定继续吗？", TaskId = 613 }
+                        }
+                    }
                 }
             },
             new TopMenuItem
             {
-                Id = 9, Name = "网络设置",
+                Id = 5, Name = "系统管理",
                 MenuItems = new List<MenuItem>
                 {
-                    new MenuItem { Id = 91, Name = "自动获取IP地址", Description = "设置网卡为DHCP自动获取IP", ConfirmMessage = "即将执行【自动获取IP地址】：\n\n将所有活动网卡设置为 DHCP 自动获取 IP 地址。\n\n确定继续吗？", TaskId = 801 },
-                    new MenuItem { Id = 92, Name = "自动获取DNS", Description = "设置DNS为自动获取", ConfirmMessage = "即将执行【自动获取DNS】：\n\n将所有活动网卡的 DNS 设置为自动获取。\n\n确定继续吗？", TaskId = 802 },
-                    new MenuItem { Id = 93, Name = "手动设置IP地址", Description = "手动指定IP地址、子网掩码、网关", ConfirmMessage = "INPUT_IP", TaskId = 803 },
-                    new MenuItem { Id = 94, Name = "手动设置DNS", Description = "手动指定首选和备用DNS", ConfirmMessage = "INPUT_DNS", TaskId = 804 },
-                    new MenuItem { Id = 95, Name = "使用预设网络配置", Description = "应用设置中保存的网络预设", ConfirmMessage = "即将执行【使用预设网络配置】：\n\n将应用设置中保存的网络预设配置。\n\n确定继续吗？", TaskId = 805 }
-                }
-            },
-            new TopMenuItem
-            {
-                Id = 5, Name = "软件管理",
-                MenuItems = new List<MenuItem>
-                {
-                    new MenuItem { Id = 51, Name = "安装seewo教学应用", Description = "静默安装 Apps/ 下所有 .exe 应用", ConfirmMessage = "即将执行【安装 seewo 教学应用】：\n\n将静默安装 Apps 目录下所有 .exe 应用程序。\n\n确定继续吗？", TaskId = 401 },
-                    new MenuItem { Id = 52, Name = "安装办公应用", Description = "静默安装 Apps2/ 下所有 .exe 应用", ConfirmMessage = "即将执行【安装办公应用】：\n\n将静默安装 Apps2 目录下所有 .exe 应用程序。\n\n确定继续吗？", TaskId = 402 },
-                    new MenuItem { Id = 53, Name = "安装搜狗输入法", Description = "从 Appx/ 安装搜狗输入法", ConfirmMessage = "即将执行【安装搜狗输入法】：\n\n从 Appx 目录安装搜狗输入法。\n\n确定继续吗？", TaskId = 403 },
-                    new MenuItem { Id = 54, Name = "安装360极速浏览器X", Description = "静默安装360极速浏览器X", ConfirmMessage = "即将执行【安装 360 极速浏览器X】：\n\n静默安装 360 极速浏览器X。\n\n确定继续吗？", TaskId = 404 },
-                    new MenuItem { Id = 55, Name = "安装360安全卫士", Description = "从 Appx/ 安装360安全卫士极速版", ConfirmMessage = "即将执行【安装 360 安全卫士】：\n\n从 Appx 目录安装 360 安全卫士极速版。\n\n确定继续吗？", TaskId = 405 },
-                    new MenuItem { Id = 56, Name = "安装希沃白板5", Description = "从 Appx/ 安装希沃白板5", ConfirmMessage = "即将执行【安装希沃白板5】：\n\n从 Appx 目录安装希沃白板5。\n\n确定继续吗？", TaskId = 406 }
-                }
-            },
-            new TopMenuItem
-            {
-                Id = 6, Name = "用户管理",
-                MenuItems = new List<MenuItem>
-                {
-                    new MenuItem { Id = 61, Name = "更改用户名为 seewo", Description = "将 Administrator 重命名为 seewo", ConfirmMessage = "即将执行【更改用户名为 seewo】：\n\n将 Administrator 账户重命名为 seewo。\n\n注意：此操作需要重启系统后生效！\n确定继续吗？", TaskId = 101 },
-                    new MenuItem { Id = 62, Name = "自定义用户名", Description = "输入新的用户名进行重命名", ConfirmMessage = "INPUT", TaskId = 102 },
-                    new MenuItem { Id = 63, Name = "迁移用户文件夹", Description = "将用户文件夹迁移到D盘", ConfirmMessage = "即将执行【迁移用户文件夹】：\n\n将以下文件夹迁移到 D:\\User\\用户名：\n- 文档\n- 下载\n- 音乐\n- 图片\n- 视频\n- 桌面\n\n注意：此操作需要 D 盘存在！\n迁移后需要重启资源管理器生效。\n确定继续吗？", TaskId = 612 },
-                    new MenuItem { Id = 64, Name = "重启资源管理器", Description = "重启资源管理器使迁移生效", ConfirmMessage = "即将执行【重启资源管理器】：\n\n将重启 Windows 资源管理器，\n使用户文件夹迁移生效。\n\n确定继续吗？", TaskId = 613 }
-                }
-            },
-            new TopMenuItem
-            {
-                Id = 7, Name = "系统管理",
-                MenuItems = new List<MenuItem>
-                {
-                    new MenuItem { Id = 71, Name = "激活系统与Office", Description = "使用 HEU KMS 激活", ConfirmMessage = "即将执行【激活系统与 Office】：\n\n使用 HEU KMS 工具激活 Windows 和 Office。\n\n确定继续吗？", TaskId = 501 },
-                    new MenuItem { Id = 72, Name = "系统优化", Description = "时间同步、隐藏图标、清理右键、硬盘优化", ConfirmMessage = "即将执行【系统优化】：\n\n1. 同步系统时间到国家授时中心\n2. 隐藏控制面板桌面图标\n3. 清理右键菜单多余项\n4. 根据硬盘类型优化设置\n5. 优化文件系统行为\n\n确定继续吗？", TaskId = 502 },
-                    new MenuItem { Id = 73, Name = "重启系统", Description = "重启计算机", ConfirmMessage = "即将执行【重启系统】：\n\n系统将在 3 秒后自动重启！\n请确保已保存所有工作。\n\n确定继续吗？", TaskId = 202 },
-                    new MenuItem { Id = 74, Name = "取消重启任务", Description = "删除重启标记文件", ConfirmMessage = "即将执行【取消重启任务】：\n\n删除所有重启相关的标记文件。\n\n确定继续吗？", TaskId = 203 }
+                    new MenuItem 
+                    { 
+                        Id = 501, Name = "常用工具", Description = "系统配置与激活",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 81, Name = "Windows轻松设置", Description = "可视化调整Windows系统设置", ConfirmMessage = "WINDOW_EASY_SETTINGS" },
+                            new MenuItem { Id = 71, Name = "激活系统与Office", Description = "使用 HEU KMS 激活", ConfirmMessage = "即将执行【激活系统与 Office】：\n\n使用 HEU KMS 工具激活 Windows 和 Office。\n\n确定继续吗？", TaskId = 501 }
+                        }
+                    },
+                    new MenuItem 
+                    { 
+                        Id = 502, Name = "系统操作", Description = "优化与重启",
+                        HasChildren = true,
+                        Children = new List<MenuItem>
+                        {
+                            new MenuItem { Id = 72, Name = "系统优化", Description = "时间同步、隐藏图标、清理右键、硬盘优化", ConfirmMessage = "即将执行【系统优化】：\n\n1. 同步系统时间到国家授时中心\n2. 隐藏控制面板桌面图标\n3. 清理右键菜单多余项\n4. 根据硬盘类型优化设置\n5. 优化文件系统行为\n\n确定继续吗？", TaskId = 502 },
+                            new MenuItem { Id = 73, Name = "重启系统", Description = "重启计算机", ConfirmMessage = "即将执行【重启系统】：\n\n系统将在 3 秒后自动重启！\n请确保已保存所有工作。\n\n确定继续吗？", TaskId = 202 },
+                            new MenuItem { Id = 74, Name = "取消重启任务", Description = "删除重启标记文件", ConfirmMessage = "即将执行【取消重启任务】：\n\n删除所有重启相关的标记文件。\n\n确定继续吗？", TaskId = 203 }
+                        }
+                    }
                 }
             }
         };
 
         foreach (var menu in topMenus)
         {
-            foreach (var item in menu.MenuItems)
-            {
-                item.HasChildren = false;
-            }
             TopMenuItems.Add(menu);
         }
 

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
 using DeployTool.Services;
 
 namespace DeployTool;
@@ -10,49 +11,141 @@ public partial class UpdateWindow : Window
     private UpdateInfo? _updateInfo;
     private string? _downloadedFilePath;
     private CancellationTokenSource? _downloadCts;
+    private CancellationTokenSource? _checkCts;
+    private bool _autoCheckMode;
 
-    public UpdateWindow()
+    public UpdateWindow(bool autoCheck = false)
     {
         InitializeComponent();
         _updateService = UpdateService.Instance;
         _updateService.DownloadProgressChanged += UpdateService_DownloadProgressChanged;
         _updateService.UpdateError += UpdateService_UpdateError;
+        _autoCheckMode = autoCheck;
         
         CurrentVersionText.Text = $"当前版本: v{_updateService.CurrentVersion}";
         
+        Loaded += UpdateWindow_Loaded;
+    }
+
+    private void UpdateWindow_Loaded(object sender, RoutedEventArgs e)
+    {
         CheckForUpdate();
     }
 
-    private async void CheckForUpdate()
+    public void CheckForUpdate()
     {
         ShowPanel("Checking");
+        _checkCts = new CancellationTokenSource();
         
-        try
+        Task.Run(async () =>
         {
-            _updateInfo = await _updateService.CheckForUpdateAsync();
-            
-            if (_updateInfo != null)
+            try
             {
-                NewVersionText.Text = $"发现新版本: v{_updateInfo.Version}";
-                ReleaseDateText.Text = _updateInfo.ReleaseDate.HasValue 
-                    ? $"发布日期: {_updateInfo.ReleaseDate.Value:yyyy-MM-dd}" 
-                    : "";
-                ReleaseNotesText.Text = _updateInfo.ReleaseNotes;
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(_checkCts.Token);
+                cts.CancelAfter(TimeSpan.FromSeconds(30));
                 
-                ShowPanel("UpdateAvailable");
-                DownloadButton.Visibility = Visibility.Visible;
-                OpenReleaseButton.Visibility = Visibility.Visible;
+                var updateInfo = await _updateService.CheckForUpdateAsync();
+                
+                if (cts.Token.IsCancellationRequested)
+                    return;
+                
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    _updateInfo = updateInfo;
+                    
+                    if (_updateInfo != null)
+                    {
+                        var hasUpdate = !string.IsNullOrEmpty(_updateInfo.DownloadUrl) && 
+                                        _updateService.IsNewerVersion(_updateInfo.Version, _updateService.CurrentVersion);
+                        
+                        if (hasUpdate)
+                        {
+                            NewVersionText.Text = $"发现新版本: v{_updateInfo.Version}";
+                            ReleaseDateText.Text = _updateInfo.ReleaseDate.HasValue 
+                                ? $"发布日期: {_updateInfo.ReleaseDate.Value:yyyy-MM-dd}" 
+                                : "";
+                            ReleaseNotesText.Text = string.IsNullOrWhiteSpace(_updateInfo.ReleaseNotes) 
+                                ? "暂无更新说明" 
+                                : _updateInfo.ReleaseNotes;
+                            
+                            VersionBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9"));
+                            VersionBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#38A169"));
+                            NewVersionText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#276749"));
+                            
+                            ShowPanel("UpdateAvailable");
+                            DownloadButton.Visibility = Visibility.Visible;
+                            OpenReleaseButton.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            if (_autoCheckMode)
+                            {
+                                Close();
+                            }
+                            else
+                            {
+                                NewVersionText.Text = $"当前已是最新版本: v{_updateService.CurrentVersion}";
+                                ReleaseDateText.Text = _updateInfo.ReleaseDate.HasValue 
+                                    ? $"发布日期: {_updateInfo.ReleaseDate.Value:yyyy-MM-dd}" 
+                                    : "";
+                                ReleaseNotesText.Text = string.IsNullOrWhiteSpace(_updateInfo.ReleaseNotes) 
+                                    ? "暂无更新说明" 
+                                    : _updateInfo.ReleaseNotes;
+                                
+                                VersionBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EBF8FF"));
+                                VersionBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3182CE"));
+                                NewVersionText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2B6CB0"));
+                                
+                                ShowPanel("UpdateAvailable");
+                                OpenReleaseButton.Visibility = Visibility.Visible;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (_autoCheckMode)
+                        {
+                            Close();
+                        }
+                        else
+                        {
+                            NoUpdateVersionText.Text = $"当前版本: v{_updateService.CurrentVersion}";
+                            ShowPanel("NoUpdate");
+                        }
+                    }
+                });
             }
-            else
+            catch (OperationCanceledException)
             {
-                ShowPanel("NoUpdate");
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (_autoCheckMode)
+                    {
+                        Close();
+                    }
+                    else
+                    {
+                        ErrorText.Text = "检查更新超时，请稍后重试。";
+                        ShowPanel("Error");
+                    }
+                });
             }
-        }
-        catch (Exception ex)
-        {
-            ErrorText.Text = $"检查更新失败:\n{ex.Message}";
-            ShowPanel("Error");
-        }
+            catch (Exception ex)
+            {
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (_autoCheckMode)
+                    {
+                        Close();
+                    }
+                    else
+                    {
+                        ErrorText.Text = $"检查更新失败:\n{ex.Message}";
+                        ShowPanel("Error");
+                    }
+                });
+            }
+        });
     }
 
     private async void DownloadButton_Click(object sender, RoutedEventArgs e)
@@ -84,6 +177,8 @@ public partial class UpdateWindow : Window
             
             InstallButton.Visibility = Visibility.Visible;
             CancelButton.Visibility = Visibility.Collapsed;
+            
+            InstallUpdate();
         }
         else if (_downloadCts.IsCancellationRequested)
         {
@@ -100,6 +195,11 @@ public partial class UpdateWindow : Window
 
     private void InstallButton_Click(object sender, RoutedEventArgs e)
     {
+        InstallUpdate();
+    }
+
+    private void InstallUpdate()
+    {
         if (string.IsNullOrEmpty(_downloadedFilePath) || !File.Exists(_downloadedFilePath))
         {
             MessageBox.Show("更新文件不存在，请重新下载。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -107,15 +207,16 @@ public partial class UpdateWindow : Window
         }
 
         var result = MessageBox.Show(
-            "即将安装更新，程序将会关闭并自动重启。\n\n是否继续？",
+            "即将安装更新，程序将会关闭并自动重启。\n\n" +
+            $"旧版本将被备份为: {_updateService.OldVersionBackupName}\n\n" +
+            "是否继续？",
             "安装更新",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes)
         {
-            var currentDir = AppDomain.CurrentDomain.BaseDirectory;
-            _updateService.InstallUpdate(_downloadedFilePath, currentDir);
+            _updateService.InstallUpdate(_downloadedFilePath);
         }
     }
 
@@ -131,6 +232,7 @@ public partial class UpdateWindow : Window
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
+        _checkCts?.Cancel();
         Close();
     }
 
@@ -151,8 +253,15 @@ public partial class UpdateWindow : Window
     {
         Dispatcher.Invoke(() =>
         {
-            ErrorText.Text = e;
-            ShowPanel("Error");
+            if (_autoCheckMode)
+            {
+                Close();
+            }
+            else
+            {
+                ErrorText.Text = e;
+                ShowPanel("Error");
+            }
         });
     }
 
@@ -175,6 +284,8 @@ public partial class UpdateWindow : Window
     {
         _updateService.DownloadProgressChanged -= UpdateService_DownloadProgressChanged;
         _updateService.UpdateError -= UpdateService_UpdateError;
+        _checkCts?.Cancel();
+        _checkCts?.Dispose();
         _downloadCts?.Dispose();
         base.OnClosed(e);
     }

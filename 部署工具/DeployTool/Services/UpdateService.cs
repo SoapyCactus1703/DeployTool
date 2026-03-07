@@ -20,9 +20,11 @@ public class UpdateService
     public string CurrentVersion { get; }
     public string DownloadUrl { get; private set; } = "";
     public string UpdateInfoUrl { get; private set; } = "";
+    public string OldVersionBackupName => "西林民高部署工具_旧版本.exe";
     
     public event EventHandler<DownloadProgressEventArgs>? DownloadProgressChanged;
     public event EventHandler<string>? UpdateError;
+    public event EventHandler<UpdateInfo>? UpdateAvailable;
 
     private UpdateService()
     {
@@ -52,6 +54,17 @@ public class UpdateService
 
             var latestVersion = release.TagName?.TrimStart('v') ?? "0.0.0";
             
+            var updateInfo = new UpdateInfo
+            {
+                Version = latestVersion,
+                ReleaseNotes = release.Body ?? "暂无更新说明",
+                DownloadUrl = "",
+                ReleaseDate = release.PublishedAt,
+                ReleaseName = release.Name ?? $"v{latestVersion}"
+            };
+            
+            UpdateInfoUrl = release.HtmlUrl ?? "";
+            
             if (IsNewerVersion(latestVersion, CurrentVersion))
             {
                 var asset = release.Assets.FirstOrDefault(a => 
@@ -60,21 +73,13 @@ public class UpdateService
                 
                 if (asset?.BrowserDownloadUrl != null)
                 {
-                    DownloadUrl = asset.BrowserDownloadUrl;
-                    UpdateInfoUrl = release.HtmlUrl ?? "";
-                    
-                    return new UpdateInfo
-                    {
-                        Version = latestVersion,
-                        ReleaseNotes = release.Body ?? "暂无更新说明",
-                        DownloadUrl = asset.BrowserDownloadUrl,
-                        ReleaseDate = release.PublishedAt,
-                        ReleaseName = release.Name ?? $"v{latestVersion}"
-                    };
+                    updateInfo.DownloadUrl = asset.BrowserDownloadUrl;
+                    UpdateAvailable?.Invoke(this, updateInfo);
+                    return updateInfo;
                 }
             }
             
-            return null;
+            return updateInfo;
         }
         catch (Exception ex)
         {
@@ -83,7 +88,7 @@ public class UpdateService
         }
     }
 
-    private bool IsNewerVersion(string latest, string current)
+    public bool IsNewerVersion(string latest, string current)
     {
         try
         {
@@ -160,10 +165,27 @@ public class UpdateService
         }
     }
 
-    public bool InstallUpdate(string zipPath, string targetDirectory)
+    public async Task<bool> DownloadAndInstallUpdateAsync(UpdateInfo updateInfo, CancellationToken cancellationToken = default)
+    {
+        var tempPath = Path.Combine(Path.GetTempPath(), $"DeployTool_v{updateInfo.Version}.zip");
+        
+        var success = await DownloadUpdateAsync(updateInfo.DownloadUrl, tempPath, cancellationToken);
+        if (!success)
+            return false;
+        
+        return InstallUpdate(tempPath);
+    }
+
+    public bool InstallUpdate(string zipPath)
     {
         try
         {
+            var currentExePath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
+            var currentDir = Path.GetDirectoryName(currentExePath) ?? AppDomain.CurrentDomain.BaseDirectory;
+            var exeName = "西林民高部署工具.exe";
+            var currentExe = Path.Combine(currentDir, exeName);
+            var oldBackup = Path.Combine(currentDir, OldVersionBackupName);
+            
             var tempDir = Path.Combine(Path.GetTempPath(), $"DeployTool_Update_{Guid.NewGuid():N}");
             Directory.CreateDirectory(tempDir);
 
@@ -173,13 +195,20 @@ public class UpdateService
             }
             else
             {
-                File.Copy(zipPath, Path.Combine(tempDir, Path.GetFileName(zipPath)));
+                File.Copy(zipPath, Path.Combine(tempDir, exeName));
             }
 
-            var currentExePath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
-            var currentDir = Path.GetDirectoryName(currentExePath) ?? AppDomain.CurrentDomain.BaseDirectory;
-            
-            var updaterPath = CreateUpdaterScript(tempDir, currentDir);
+            var newExePath = Path.Combine(tempDir, exeName);
+            if (!File.Exists(newExePath))
+            {
+                var files = Directory.GetFiles(tempDir, "*.exe", SearchOption.AllDirectories);
+                if (files.Length > 0)
+                {
+                    newExePath = files[0];
+                }
+            }
+
+            var updaterPath = CreateUpdaterScript(tempDir, currentDir, exeName);
             
             var psi = new ProcessStartInfo
             {
@@ -201,15 +230,18 @@ public class UpdateService
         }
     }
 
-    private string CreateUpdaterScript(string sourceDir, string targetDir)
+    private string CreateUpdaterScript(string sourceDir, string targetDir, string exeName)
     {
         var scriptPath = Path.Combine(Path.GetTempPath(), "update_deploy_tool.bat");
         var currentProcessId = Environment.ProcessId;
-        var exeName = "西林民高部署工具.exe";
+        var oldBackup = OldVersionBackupName;
         
         var script = $@"@echo off
 chcp 65001 >nul
-echo 正在更新部署工具，请稍候...
+title 部署工具更新程序
+echo ========================================
+echo    西林民高部署工具 - 自动更新程序
+echo ========================================
 echo.
 
 :wait_process
@@ -221,21 +253,42 @@ if %errorlevel% equ 0 (
 
 timeout /t 2 /nobreak >nul
 
-echo 正在复制文件...
+echo [1/3] 备份旧版本...
+if exist ""{targetDir}\{oldBackup}"" (
+    echo 删除旧的备份文件...
+    del /F /Q ""{targetDir}\{oldBackup}""
+)
 
+if exist ""{targetDir}\{exeName}"" (
+    echo 重命名当前版本为备份...
+    ren ""{targetDir}\{exeName}"" ""{oldBackup}""
+)
+
+echo [2/3] 安装新版本...
 if exist ""{sourceDir}\{exeName}"" (
-    copy /Y ""{sourceDir}\{exeName}"" ""{targetDir}\""
+    copy /Y ""{sourceDir}\{exeName}"" ""{targetDir}\{exeName}""
+    echo 新版本已复制。
+) else (
+    echo 错误: 找不到新版本文件！
+    echo 正在恢复旧版本...
+    if exist ""{targetDir}\{oldBackup}"" (
+        ren ""{targetDir}\{oldBackup}"" ""{exeName}""
+    )
+    pause
+    exit /b 1
 )
 
-if exist ""{sourceDir}\Data"" (
-    xcopy /E /Y /I ""{sourceDir}\Data"" ""{targetDir}\Data""
-)
+echo [3/3] 清理临时文件...
+rd /s /q ""{sourceDir}"" 2>nul
 
 echo.
-echo 更新完成！正在启动程序...
+echo ========================================
+echo    更新完成！正在启动新版本...
+echo ========================================
+echo.
+
 start """" ""{targetDir}\{exeName}""
 
-rd /s /q ""{sourceDir}"" 2>nul
 del ""%~f0""
 exit
 ";
@@ -254,6 +307,27 @@ exit
                 UseShellExecute = true
             });
         }
+    }
+
+    public bool HasOldBackup()
+    {
+        var currentDir = AppDomain.CurrentDomain.BaseDirectory;
+        var oldBackup = Path.Combine(currentDir, OldVersionBackupName);
+        return File.Exists(oldBackup);
+    }
+
+    public void DeleteOldBackup()
+    {
+        try
+        {
+            var currentDir = AppDomain.CurrentDomain.BaseDirectory;
+            var oldBackup = Path.Combine(currentDir, OldVersionBackupName);
+            if (File.Exists(oldBackup))
+            {
+                File.Delete(oldBackup);
+            }
+        }
+        catch { }
     }
 }
 

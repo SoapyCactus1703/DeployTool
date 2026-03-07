@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System.Windows;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using DeployTool.Models;
@@ -48,6 +48,8 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        (Application.Current as App)?.SetMainWindow(this);
+        
         _viewModel.LoadSystemInfo();
         
         Dispatcher.BeginInvoke(new Action(() =>
@@ -89,13 +91,31 @@ public partial class MainWindow : Window
         {
             if (button.Tag is MenuItem item)
             {
-                _viewModel.ExecuteMenuItem(item);
+                if (item.HasChildren)
+                {
+                    return;
+                }
+                
+                if (item.ConfirmMessage == "WINDOW_EASY_SETTINGS")
+                {
+                    OpenWindowsEasySettings();
+                }
+                else
+                {
+                    _viewModel.ExecuteMenuItem(item);
+                }
             }
             else if (button.Name == "MenuButton")
             {
                 MenuPopup.IsOpen = !MenuPopup.IsOpen;
             }
         }
+    }
+
+    private void OpenWindowsEasySettings()
+    {
+        var window = new WindowsEasySettingsWindow { Owner = this };
+        window.ShowDialog();
     }
 
     private void Settings_Click(object sender, RoutedEventArgs e)
@@ -138,14 +158,15 @@ public partial class MainWindow : Window
 
     private void ViewModel_ConfirmRequested(object? sender, ConfirmEventArgs e)
     {
-        var result = MessageBox.Show(
-            e.Message,
-            "确认执行",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question,
-            MessageBoxResult.No);
-
-        e.Confirmed = result == MessageBoxResult.Yes;
+        var dialog = new ConfirmDialog(e.Message) { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            e.Confirmed = dialog.IsConfirmed;
+        }
+        else
+        {
+            e.Confirmed = false;
+        }
     }
 
     private void ViewModel_InputRequested(object? sender, InputEventArgs e)

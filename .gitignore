@@ -59,6 +59,9 @@ artifacts/
 # Rider
 .idea/
 
+# VS Code
+.vscode/
+
 # User-specific files
 *.rsuser
 
