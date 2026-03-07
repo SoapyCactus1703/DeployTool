@@ -10,6 +10,11 @@ public partial class ErrorDialog : Window
         MessageText.Text = message;
     }
 
+    public ErrorDialog(string title, string message) : this(message)
+    {
+        TitleText.Text = title;
+    }
+
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();

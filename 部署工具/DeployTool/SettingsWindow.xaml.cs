@@ -121,36 +121,38 @@ public partial class SettingsWindow : Window
 
     private void SelfDestruct_Click(object sender, RoutedEventArgs e)
     {
-        var result = MessageBox.Show(
-            "确定要清理部署工具吗？\n\n" +
-            "此操作将：\n" +
+        var dialog = new WarningDialog(
+            "确认清理部署工具",
+            "此操作将执行以下操作：\n\n" +
             "1. 删除桌面快捷方式\n" +
             "2. 强制关闭本程序\n" +
-            "3. 删除程序所在目录及所有文件\n\n" +
-            "此操作不可撤销！",
-            "确认清理",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-
-        if (result != MessageBoxResult.Yes)
+            "3. 删除程序所在目录及所有文件\n" +
+            "4. 删除程序所在的母目录（如果为空）\n\n" +
+            "⚠ 警告：此操作不可撤销！所有数据将永久丢失！",
+            "确认清理");
+        
+        dialog.Owner = this;
+        
+        if (dialog.ShowDialog() != true || !dialog.IsConfirmed)
             return;
 
-        var finalConfirm = MessageBox.Show(
-            "最后确认：\n\n" +
-            "您真的要删除部署工具吗？\n" +
-            "删除后将无法恢复！",
+        var finalDialog = new WarningDialog(
             "最后确认",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Stop);
-
-        if (finalConfirm != MessageBoxResult.Yes)
+            "⚠ 您真的要删除部署工具吗？\n\n" +
+            "删除后将无法恢复！\n" +
+            "所有配置和日志都将永久丢失！",
+            "确认删除");
+        
+        finalDialog.Owner = this;
+        
+        if (finalDialog.ShowDialog() != true || !finalDialog.IsConfirmed)
             return;
 
         try
         {
             var exePath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
             var programDir = Path.GetDirectoryName(exePath) ?? AppDomain.CurrentDomain.BaseDirectory;
-            var programDirName = new DirectoryInfo(programDir).Name;
+            var parentDir = Directory.GetParent(programDir)?.FullName;
             
             var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var shortcutPath = Path.Combine(desktopPath, "西林民高部署工具.lnk");
@@ -168,11 +170,16 @@ REM 等待程序退出
 timeout /t 2 /nobreak >nul
 
 REM 删除程序目录
-:retry
+:retry_program
 rd /s /q ""{programDir}"" 2>nul
 if exist ""{programDir}"" (
     timeout /t 1 /nobreak >nul
-    goto retry
+    goto retry_program
+)
+
+REM 删除母目录（如果为空或只剩下空文件夹）
+if exist ""{parentDir}"" (
+    rd /q ""{parentDir}"" 2>nul
 )
 
 echo 清理完成！
@@ -197,7 +204,9 @@ exit
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"清理失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            var errorDialog = new ErrorDialog("清理失败", ex.Message);
+            errorDialog.Owner = this;
+            errorDialog.ShowDialog();
         }
     }
 

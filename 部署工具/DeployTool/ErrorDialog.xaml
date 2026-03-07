@@ -25,7 +25,7 @@
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="发生错误" FontSize="18" FontWeight="Bold" Foreground="#C53030"/>
+                    <TextBlock x:Name="TitleText" Text="发生错误" FontSize="18" FontWeight="Bold" Foreground="#C53030"/>
                 </StackPanel>
             </StackPanel>
 
