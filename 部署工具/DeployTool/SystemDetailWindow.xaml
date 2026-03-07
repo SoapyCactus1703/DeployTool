@@ -1,0 +1,535 @@
+<Window x:Class="DeployTool.SystemDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="系统详细信息"
+        Height="820" Width="1150"
+        WindowStartupLocation="CenterOwner"
+        Background="#F0F4F8"
+        ResizeMode="CanResize"
+        MinHeight="700" MinWidth="1000">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <TextBlock Text="系统详细信息" FontSize="16" FontWeight="Bold" Foreground="#1E3A5F"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="刷新间隔: " Foreground="#718096" FontSize="11" VerticalAlignment="Center"/>
+                <TextBlock x:Name="RefreshIntervalText" Text="1秒" Foreground="#3182CE" FontSize="11" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="CPU" FontWeight="SemiBold" Foreground="#3182CE" FontSize="13" Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding Cpu.Name}" FontSize="11" TextWrapping="Wrap" FontWeight="Medium"/>
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontSize="10" Foreground="#718096">
+                                    <Run Text="核心:"/><LineBreak/>
+                                    <Run Text="{Binding Cpu.Cores, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" FontSize="10" Foreground="#718096">
+                                    <Run Text="线程:"/><LineBreak/>
+                                    <Run Text="{Binding Cpu.LogicalProcessors, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="2" FontSize="10" Foreground="#718096">
+                                    <Run Text="代数:"/><LineBreak/>
+                                    <Run Text="{Binding Cpu.GenerationName, Mode=OneWay}"/>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="CPU 温度" FontWeight="SemiBold" Foreground="#3182CE" FontSize="12"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock x:Name="CurrentTempText" Text="--°C" FontSize="14" FontWeight="Bold" Foreground="#3182CE"/>
+                                </StackPanel>
+                            </Grid>
+                            <Border Background="#F7FAFC" CornerRadius="4" Height="70" Margin="0,0,0,4">
+                                <Canvas x:Name="TempChartCanvas" Background="Transparent"/>
+                            </Border>
+                            <Grid>
+                                <TextBlock FontSize="10" Foreground="#48BB78">
+                                    <Run Text="最低: "/><Run x:Name="MinTempText" Text="--°C"/>
+                                </TextBlock>
+                                <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="#E53E3E">
+                                    <Run Text="最高: "/><Run x:Name="MaxTempText" Text="--°C"/>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="CPU 状态" FontWeight="SemiBold" Foreground="#3182CE" FontSize="12" Margin="0,0,0,6"/>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="负载" FontSize="10" Foreground="#718096" VerticalAlignment="Center"/>
+                                <ProgressBar Value="{Binding CpuLoad}" Maximum="100" Height="12" Margin="40,0,50,0" Background="#E2E8F0" Foreground="#4299E1"/>
+                                <TextBlock Text="{Binding CpuLoad, StringFormat={}{0:F0}%}" FontSize="10" HorizontalAlignment="Right" Foreground="#4299E1"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="当前频率" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock x:Name="CurrentFreqText" Text="-- MHz" FontSize="12" FontWeight="Medium"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="最大频率" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock x:Name="MaxFreqText" Text="-- MHz" FontSize="12" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="风扇转速" FontWeight="SemiBold" Foreground="#3182CE" FontSize="12" Margin="0,0,0,6"/>
+                            <ItemsControl x:Name="FanSpeedItems">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,2">
+                                            <TextBlock Text="{Binding Name}" FontSize="10" Foreground="#718096"/>
+                                            <TextBlock Text="{Binding Speed, StringFormat={}{0} RPM}" FontSize="10" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="NoFanText" Text="无风扇数据" FontSize="10" Foreground="#A0AEC0" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="6,0">
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="内存 (RAM)" FontWeight="SemiBold" Foreground="#48BB78" FontSize="13" Margin="0,0,0,6"/>
+                            <Grid Margin="0,0,0,4">
+                                <ProgressBar Value="{Binding Memory.UsedPercentage}" Maximum="100" Height="14" Background="#E2E8F0" Foreground="#48BB78"/>
+                                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Foreground="#4A5568" Margin="0,0,4,0">
+                                    <Run Text="{Binding Memory.UsedPercentage, Mode=OneWay, StringFormat={}{0:F1}}"/><Run Text="%"/>
+                                </TextBlock>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontSize="10" Foreground="#718096">
+                                    <Run Text="总计: "/><Run Text="{Binding Memory.TotalSizeGB, Mode=OneWay}"/><Run Text=" GB"/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" FontSize="10" Foreground="#718096">
+                                    <Run Text="可用: "/><Run Text="{Binding Memory.AvailableGB, Mode=OneWay}"/><Run Text=" GB"/>
+                                </TextBlock>
+                            </Grid>
+                            <TextBlock x:Name="MemoryFreqText" Text="频率: -- MHz" FontSize="10" Foreground="#718096" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="显卡 (GPU)" FontWeight="SemiBold" Foreground="#9F7AEA" FontSize="13" Margin="0,0,0,6"/>
+                            <TextBlock Text="{Binding Gpu.Name}" FontSize="11" TextWrapping="Wrap" FontWeight="Medium" Margin="0,0,0,4"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" FontSize="10" Foreground="#718096">
+                                    <Run Text="显存: "/><Run Text="{Binding Gpu.MemoryMB, Mode=OneWay}"/><Run Text=" MB"/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" FontSize="10" Foreground="#718096" TextWrapping="Wrap">
+                                    <Run Text="驱动: "/><Run Text="{Binding Gpu.DriverVersion, Mode=OneWay}"/>
+                                </TextBlock>
+                            </Grid>
+                            <Grid Margin="0,4,0,0">
+                                <TextBlock Text="负载" FontSize="10" Foreground="#718096" VerticalAlignment="Center"/>
+                                <ProgressBar Value="{Binding GpuLoad}" Maximum="100" Height="10" Margin="40,0,50,0" Background="#E2E8F0" Foreground="#9F7AEA"/>
+                                <TextBlock Text="{Binding GpuLoad, StringFormat={}{0:F0}%}" FontSize="10" HorizontalAlignment="Right" Foreground="#9F7AEA"/>
+                            </Grid>
+                            <Grid Margin="0,4,0,0">
+                                <TextBlock Text="温度" FontSize="10" Foreground="#718096" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="GpuTempText" Text="--°C" FontSize="11" HorizontalAlignment="Right" FontWeight="Medium"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="主板" FontWeight="SemiBold" Foreground="#ED8936" FontSize="13" Margin="0,0,0,6"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="厂商: " Foreground="#718096" FontSize="10"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Motherboard.Manufacturer}" FontSize="10" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="型号: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Motherboard.Product}" FontSize="10" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="BIOS: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Motherboard.BiosVersion}" FontSize="10" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="BIOS日期: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Motherboard.BiosDate}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="BIOS厂商: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Motherboard.BiosVendor}" FontSize="10" Margin="0,2,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="系统" FontWeight="SemiBold" Foreground="#4A5568" FontSize="13" Margin="0,0,0,6"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="计算机名: " Foreground="#718096" FontSize="10"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ComputerName}" FontSize="10" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="用户: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding UserName}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="运行时间: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SystemUptime}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="版本: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding WindowsBuild}" FontSize="10" Margin="0,2,0,0"/>
+                            </Grid>
+                            <Grid Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                    <Ellipse Width="6" Height="6" Margin="0,0,4,0" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#E53E3E"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsWindowsActivated}" Value="True">
+                                                        <Setter Property="Fill" Value="#48BB78"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="Windows" FontSize="9" Foreground="#718096"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Ellipse Width="6" Height="6" Margin="0,0,4,0" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#E53E3E"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOfficeActivated}" Value="True">
+                                                        <Setter Property="Fill" Value="#48BB78"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="Office" FontSize="9" Foreground="#718096"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="6,0">
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="磁盘分区" FontWeight="SemiBold" Foreground="#38B2AC" FontSize="13" Margin="0,0,0,6"/>
+                            <ItemsControl ItemsSource="{Binding Disks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,6">
+                                            <Grid>
+                                                <TextBlock Text="{Binding DriveLetter}" FontWeight="Medium" FontSize="10"/>
+                                                <TextBlock Text="{Binding VolumeLabel}" Foreground="#A0AEC0" FontSize="9" Margin="20,0,0,0"/>
+                                                <TextBlock HorizontalAlignment="Right" FontSize="9" Foreground="#718096">
+                                                    <Run Text="{Binding TotalSizeGB, Mode=OneWay}"/><Run Text="GB"/>
+                                                </TextBlock>
+                                            </Grid>
+                                            <Grid Margin="0,2,0,0">
+                                                <ProgressBar Value="{Binding UsedPercentage}" Maximum="100" Height="6" Background="#E2E8F0">
+                                                    <ProgressBar.Style>
+                                                        <Style TargetType="ProgressBar">
+                                                            <Setter Property="Foreground" Value="#48BB78"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsHighUsage}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#E53E3E"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ProgressBar.Style>
+                                                </ProgressBar>
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="硬盘健康 (SMART)" FontWeight="SemiBold" Foreground="#38B2AC" FontSize="12" Margin="0,0,0,6"/>
+                            <ItemsControl x:Name="StorageHealthItems">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,8">
+                                            <Grid>
+                                                <TextBlock Text="{Binding Name}" FontSize="10" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding MediaType}" FontSize="9" Foreground="#A0AEC0" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,2,0,0">
+                                                <TextBlock Text="健康状态:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding Status}" FontSize="9" HorizontalAlignment="Right">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#48BB78"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsWarning}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#E53E3E"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="剩余寿命:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock FontSize="9" HorizontalAlignment="Right">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#48BB78"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsWarning}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#E53E3E"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                    <Run Text="{Binding RemainingLife, Mode=OneWay}"/><Run Text="%"/>
+                                                </TextBlock>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="通电时间:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedPowerOnHours}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="读取量:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedDataRead}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="写入量:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedDataWritten}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="NoStorageHealthText" Text="无SMART数据" FontSize="10" Foreground="#A0AEC0" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="网络速度" FontWeight="SemiBold" Foreground="#667EEA" FontSize="12" Margin="0,0,0,6"/>
+                            <ItemsControl x:Name="NetworkSpeedItems">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,8">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Medium" FontSize="10" TextWrapping="Wrap"/>
+                                            <Grid Margin="0,2,0,0">
+                                                <TextBlock Text="上传速度:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedUploadSpeed}" FontSize="9" HorizontalAlignment="Right" Foreground="#E53E3E"/>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="下载速度:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedDownloadSpeed}" FontSize="9" HorizontalAlignment="Right" Foreground="#48BB78"/>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="累计上传:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedTotalUpload}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <Grid Margin="0,1,0,0">
+                                                <TextBlock Text="累计下载:" FontSize="9" Foreground="#718096"/>
+                                                <TextBlock Text="{Binding FormattedTotalDownload}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="NoNetworkText" Text="无网络数据" FontSize="10" Foreground="#A0AEC0" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Margin="6,0,0,0">
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="电池" FontWeight="SemiBold" Foreground="#F6AD55" FontSize="13" Margin="0,0,0,6"/>
+                            <Grid x:Name="BatteryGrid">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Grid Grid.Row="0" Margin="0,0,0,4">
+                                    <TextBlock Text="电量" FontSize="10" Foreground="#718096" VerticalAlignment="Center"/>
+                                    <ProgressBar Value="{Binding Battery.ChargeLevel}" Maximum="100" Height="14" Margin="30,0,50,0" Background="#E2E8F0" Foreground="#F6AD55"/>
+                                    <TextBlock Text="{Binding Battery.ChargeLevel, StringFormat={}{0}%}" FontSize="10" HorizontalAlignment="Right" Foreground="#F6AD55"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="1" Margin="0,1,0,0">
+                                    <TextBlock Text="状态:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedStatus}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="2" Margin="0,1,0,0">
+                                    <TextBlock Text="电池健康:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedHealth}" FontSize="9" HorizontalAlignment="Right">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#48BB78"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Battery.IsHealthWarning}" Value="True">
+                                                        <Setter Property="Foreground" Value="#E53E3E"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                
+                                <Grid Grid.Row="3" Margin="0,1,0,0">
+                                    <TextBlock Text="损耗程度:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedDegradation}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="4" Margin="0,1,0,0">
+                                    <TextBlock Text="设计容量:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedDesignCapacity}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="5" Margin="0,1,0,0">
+                                    <TextBlock Text="满电容量:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedFullChargedCapacity}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="6" Margin="0,1,0,0">
+                                    <TextBlock Text="当前容量:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedCurrentCapacity}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="7" Margin="0,1,0,0">
+                                    <TextBlock Text="电压:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedVoltage}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="8" Margin="0,1,0,0">
+                                    <TextBlock Text="充电速率:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedChargeRate}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="9" Margin="0,1,0,0">
+                                    <TextBlock Text="循环次数:" FontSize="9" Foreground="#718096"/>
+                                    <TextBlock Text="{Binding Battery.FormattedCycleCount}" FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Grid>
+                            <TextBlock x:Name="NoBatteryText" Text="无电池设备" FontSize="10" Foreground="#A0AEC0" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" Margin="0,0,0,6" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="显卡详细信息" FontWeight="SemiBold" Foreground="#9F7AEA" FontSize="12" Margin="0,0,0,6"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="厂商: " Foreground="#718096" FontSize="10"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Gpu.Manufacturer}" FontSize="10" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="处理器: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Gpu.VideoProcessor}" FontSize="10" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="显存: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Gpu.FormattedMemory}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="分辨率: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Gpu.Resolution}" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="驱动版本: " Foreground="#718096" FontSize="10" Margin="0,2,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Gpu.DriverVersion}" FontSize="10" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="White" CornerRadius="6" Padding="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="网络适配器" FontWeight="SemiBold" Foreground="#667EEA" FontSize="12" Margin="0,0,0,6"/>
+                            <ItemsControl ItemsSource="{Binding Networks}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,6">
+                                            <TextBlock Text="{Binding AdapterName}" FontWeight="Medium" FontSize="10" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Description}" FontSize="9" Foreground="#A0AEC0" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding IpAddress}" FontSize="9" Foreground="#718096"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

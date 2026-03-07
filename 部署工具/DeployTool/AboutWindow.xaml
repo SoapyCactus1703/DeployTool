@@ -1,0 +1,52 @@
+<Window x:Class="DeployTool.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="关于软件"
+        Height="320" Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F0F4F8">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <Image x:Name="AuthorAvatar" Width="64" Height="64" Margin="0,0,16,0"/>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="西林民高部署工具" FontSize="18" FontWeight="Bold" Foreground="#1E3A5F"/>
+                <TextBlock Text="v9.5.0 正式版" FontSize="12" Foreground="#718096" Margin="0,4,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="专为西林民高教学终端自动化部署设计" FontSize="12" Foreground="#4A5568" TextWrapping="Wrap" Margin="0,0,0,12"/>
+            
+            <Border Background="White" CornerRadius="6" Padding="12" Margin="0,0,0,8"
+                    BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="作者信息" FontSize="11" Foreground="#718096" Margin="0,0,0,8"/>
+                    <TextBlock Text="作者：2020级 带点橘子味的馒头" FontSize="12" Foreground="#2D3748"/>
+                    <TextBlock Text="版权所有 © 2024-2026 西林民高电教处" FontSize="11" Foreground="#718096" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Button Grid.Row="2" Content="确定" Width="80" Height="28" Click="OK_Click" HorizontalAlignment="Right" Foreground="White">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="#3182CE" CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2B6CB0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</Window>

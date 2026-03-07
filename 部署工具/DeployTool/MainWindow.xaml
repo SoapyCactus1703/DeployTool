@@ -1,0 +1,616 @@
+﻿<Window x:Class="DeployTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DeployTool.ViewModels"
+        xmlns:models="clr-namespace:DeployTool.Models"
+        Title="西林民高部署工具"
+        WindowStartupLocation="CenterScreen"
+        Background="#F0F4F8"
+        Loaded="Window_Loaded">
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#1E3A5F" Padding="16,10">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="西林民高部署工具" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding SystemInfo.ComputerName, StringFormat='计算机: {0}'}" 
+                               FontSize="12" Foreground="#A0C4E8" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <TextBlock Text="{Binding SystemInfo.UserName, StringFormat='用户: {0}'}" 
+                               FontSize="12" Foreground="#A0C4E8" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                    <Button x:Name="MenuButton" Click="MenuButton_Click" Background="Transparent" BorderThickness="0" 
+                            Width="32" Height="32" Cursor="Hand">
+                        <TextBlock Text="☰" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="#3D5A7F"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Popup x:Name="MenuPopup" PlacementTarget="{Binding ElementName=MenuButton}" Placement="Bottom" 
+                           StaysOpen="False" AllowsTransparency="True">
+                        <Border Background="White" CornerRadius="6" Padding="4" Margin="0,4,0,0"
+                                BorderBrush="#E2E8F0" BorderThickness="1">
+                            <StackPanel MinWidth="140">
+                                <Button Click="Settings_Click" HorizontalContentAlignment="Left" Padding="12,8" 
+                                        Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⚙" FontSize="14" Margin="0,0,8,0"/>
+                                        <TextBlock Text="设置" FontSize="13"/>
+                                    </StackPanel>
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F7FAFC"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <Button Click="About_Click" HorizontalContentAlignment="Left" Padding="12,8"
+                                        Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="ℹ" FontSize="14" Margin="0,0,8,0"/>
+                                        <TextBlock Text="关于软件" FontSize="13"/>
+                                    </StackPanel>
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F7FAFC"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                                <Button Click="CheckUpdate_Click" HorizontalContentAlignment="Left" Padding="12,8"
+                                        Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="↑" FontSize="14" Margin="0,0,8,0"/>
+                                        <TextBlock Text="检查更新" FontSize="13"/>
+                                    </StackPanel>
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#F7FAFC"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="#2D4A6F" Padding="8,0">
+            <ItemsControl ItemsSource="{Binding TopMenuItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Click="TopMenu_Click" Tag="{Binding}" Margin="2,4" Padding="16,8"
+                                Background="Transparent" Foreground="White" BorderThickness="0"
+                                FontSize="13" FontWeight="SemiBold" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                                        CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#3D5A7F"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#4A7AB0"/>
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <TextBlock Text="{Binding Name}"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource SectionBorderStyle}" Margin="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <TextBlock Text="系统概览" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
+                        <Button Content="查看详情" Click="SystemDetail_Click" HorizontalAlignment="Right"
+                                FontSize="11" Padding="8,4" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="border" Background="#3182CE" CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="White"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#2B6CB0"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="处理器 (CPU)" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{Binding SystemInfo.Cpu.Name}" TextWrapping="Wrap" FontWeight="Medium" Margin="0,0,0,4"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="11" Foreground="#718096">
+                                            <Run Text="核心: "/>
+                                            <Run Text="{Binding SystemInfo.Cpu.Cores, Mode=OneWay}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" FontSize="11" Foreground="#718096">
+                                            <Run Text="线程: "/>
+                                            <Run Text="{Binding SystemInfo.Cpu.LogicalProcessors, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </Grid>
+                                    <TextBlock FontSize="11" Foreground="#718096" Margin="0,2,0,0">
+                                        <Run Text="代数: "/>
+                                        <Run Text="{Binding SystemInfo.Cpu.GenerationName, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <TextBlock FontSize="11" Foreground="#718096" Text="温度: "/>
+                                        <TextBlock FontSize="11" FontWeight="Medium" x:Name="CpuTempText">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="不支持"/>
+                                                    <Setter Property="Foreground" Value="#718096"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SystemInfo.CpuTemperature.IsAvailable}" Value="True">
+                                                            <Setter Property="Text" Value="{Binding SystemInfo.CpuTemperature.Temperature, StringFormat={}{0:F1}°C}"/>
+                                                        </DataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding SystemInfo.CpuTemperature.IsAvailable}" Value="True"/>
+                                                                <Condition Binding="{Binding SystemInfo.CpuTemperature.IsWarning}" Value="True"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Foreground" Value="#E53E3E"/>
+                                                            <Setter Property="FontWeight" Value="Bold"/>
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="显卡 (GPU)" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{Binding SystemInfo.Gpu.Name}" TextWrapping="Wrap" FontWeight="Medium" Margin="0,0,0,4"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="11" Foreground="#718096">
+                                            <Run Text="显存: "/>
+                                            <Run Text="{Binding SystemInfo.Gpu.MemoryMB, Mode=OneWay}"/>
+                                            <Run Text=" MB"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" FontSize="11" Foreground="#718096" TextWrapping="Wrap">
+                                            <Run Text="驱动: "/>
+                                            <Run Text="{Binding SystemInfo.Gpu.DriverVersion, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="内存 (RAM)" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <Grid Margin="0,0,0,4">
+                                        <ProgressBar Value="{Binding SystemInfo.Memory.UsedPercentage}" Maximum="100" Height="10" 
+                                                     Background="#E2E8F0" Foreground="#4299E1"/>
+                                        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                   FontSize="10" Foreground="#4A5568" Margin="0,-1,4,0">
+                                            <Run Text="{Binding SystemInfo.Memory.UsedPercentage, Mode=OneWay, StringFormat={}{0:F1}}"/>
+                                            <Run Text="%"/>
+                                        </TextBlock>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="11" Foreground="#718096">
+                                            <Run Text="总计: "/>
+                                            <Run Text="{Binding SystemInfo.Memory.TotalSizeGB, Mode=OneWay}"/>
+                                            <Run Text=" GB"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" FontSize="11" Foreground="#718096">
+                                            <Run Text="可用: "/>
+                                            <Run Text="{Binding SystemInfo.Memory.AvailableGB, Mode=OneWay}"/>
+                                            <Run Text=" GB"/>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="主板信息" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <TextBlock FontSize="11" Foreground="#718096" TextWrapping="Wrap">
+                                        <Run Text="厂商: "/>
+                                        <Run Text="{Binding SystemInfo.Motherboard.Manufacturer, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock FontSize="11" Foreground="#718096" TextWrapping="Wrap">
+                                        <Run Text="型号: "/>
+                                        <Run Text="{Binding SystemInfo.Motherboard.Product, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock FontSize="11" Foreground="#718096" TextWrapping="Wrap">
+                                        <Run Text="BIOS: "/>
+                                        <Run Text="{Binding SystemInfo.Motherboard.BiosVersion, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="磁盘信息" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <ItemsControl ItemsSource="{Binding SystemInfo.Disks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,0,0,8">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding DriveLetter}" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding VolumeLabel}" Foreground="#718096" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Grid.Column="2" Foreground="#718096" FontSize="11">
+                                                            <Run Text="{Binding TotalSizeGB, Mode=OneWay}"/>
+                                                            <Run Text="GB"/>
+                                                            <Run Text=" (" Foreground="#A0AEC0"/>
+                                                            <Run Text="{Binding DriveType, Mode=OneWay}" Foreground="#A0AEC0"/>
+                                                            <Run Text=")" Foreground="#A0AEC0"/>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                    <Grid Margin="0,3,0,0">
+                                                        <ProgressBar Value="{Binding UsedPercentage}" Maximum="100" Height="6" 
+                                                                     Background="#E2E8F0" Foreground="#48BB78"/>
+                                                        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                                                   FontSize="9" Foreground="#4A5568" Margin="0,-1,2,0">
+                                                            <Run Text="{Binding UsedPercentage, Mode=OneWay, StringFormat={}{0:F1}}"/>
+                                                            <Run Text="%"/>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" FontSize="9" Foreground="#718096">
+                                                            <Run Text="已用: "/>
+                                                            <Run Text="{Binding UsedSizeGB, Mode=OneWay}"/>
+                                                            <Run Text="GB"/>
+                                                        </TextBlock>
+                                                        <TextBlock Grid.Column="1" FontSize="9" Foreground="#718096" HorizontalAlignment="Right">
+                                                            <Run Text="可用: "/>
+                                                            <Run Text="{Binding FreeSizeGB, Mode=OneWay}"/>
+                                                            <Run Text="GB"/>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="网络信息" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <ItemsControl ItemsSource="{Binding SystemInfo.Networks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,0,0,6">
+                                                    <TextBlock Text="{Binding AdapterName}" FontWeight="Medium" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding Description}" FontSize="10" Foreground="#A0AEC0" TextWrapping="Wrap"/>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="IP: " Foreground="#718096" FontSize="10"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding IpAddress}" FontSize="10"/>
+                                                    </Grid>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="MAC: " Foreground="#718096" FontSize="10"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding MacAddress}" FontSize="10"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F7FAFC" CornerRadius="4" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="系统状态" FontWeight="SemiBold" Foreground="#4A5568" Margin="0,0,0,6"/>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Windows: " Foreground="#718096" FontSize="11"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Ellipse Width="8" Height="8" Margin="0,0,4,0">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#E53E3E"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding SystemInfo.IsWindowsActivated}" Value="True">
+                                                                <Setter Property="Fill" Value="#48BB78"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock Text="{Binding SystemInfo.WindowsActivationStatus}" FontSize="11"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Office: " Foreground="#718096" FontSize="11"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Ellipse Width="8" Height="8" Margin="0,0,4,0">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#E53E3E"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding SystemInfo.IsOfficeActivated}" Value="True">
+                                                                <Setter Property="Fill" Value="#48BB78"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock Text="{Binding SystemInfo.OfficeActivationStatus}" FontSize="11"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Text="{Binding SystemInfo.WindowsVersion}" FontSize="10" Foreground="#718096" TextWrapping="Wrap" Margin="0,4,0,2"/>
+                                    <TextBlock Text="{Binding SystemInfo.WindowsBuild}" FontSize="10" Foreground="#A0AEC0" TextWrapping="Wrap"/>
+                                    <TextBlock FontSize="10" Foreground="#718096" Margin="0,4,0,0">
+                                        <Run Text="运行时间: "/>
+                                        <Run Text="{Binding SystemInfo.SystemUptime, Mode=OneWay}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource SectionBorderStyle}" Margin="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{Binding CurrentCategory}" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,8"/>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding CurrentMenuItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource MenuButtonStyle}" 
+                                            Click="MenuButton_Click"
+                                            Tag="{Binding}"
+                                            HorizontalContentAlignment="Stretch"
+                                            Margin="0,2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="#718096" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="›" FontSize="18" Foreground="#A0AEC0" VerticalAlignment="Center" Margin="8,0,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasChildren}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Grid Grid.Row="2" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Style="{StaticResource SecondaryButtonStyle}" 
+                                Content="刷新信息" Command="{Binding RefreshSystemInfoCommand}" Margin="0"/>
+                        <ProgressBar Grid.Column="2" Width="100" Height="20" 
+                                     IsIndeterminate="{Binding IsExecuting}"
+                                     Visibility="{Binding IsExecuting, Converter={StaticResource BoolToVis}}"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource SectionBorderStyle}" Margin="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="运行日志" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,8"/>
+
+                    <ScrollViewer Grid.Row="1" x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding LogEntries}" x:Name="LogItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="0,3">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss}'}" 
+                                                           FontSize="9" Foreground="#A0AEC0" Margin="0,0,6,0"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding LevelText}" 
+                                                           FontSize="9" FontWeight="SemiBold" Margin="0,0,6,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Info}">
+                                                                    <Setter Property="Foreground" Value="#4299E1"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Success}">
+                                                                    <Setter Property="Foreground" Value="#48BB78"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Warning}">
+                                                                    <Setter Property="Foreground" Value="#ED8936"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Error}">
+                                                                    <Setter Property="Foreground" Value="#E53E3E"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Grid.Column="2" Text="{Binding Category}" 
+                                                           FontSize="9" Foreground="#718096"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="11">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Info}">
+                                                                <Setter Property="Foreground" Value="#2D3748"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Success}">
+                                                                <Setter Property="Foreground" Value="#276749"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Warning}">
+                                                                <Setter Property="Foreground" Value="#C05621"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="{x:Static models:LogLevel.Error}">
+                                                                <Setter Property="Foreground" Value="#C53030"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <Button Grid.Row="2" Style="{StaticResource SecondaryButtonStyle}" 
+                            Content="清空日志" Command="{Binding ClearLogCommand}" 
+                            HorizontalAlignment="Right" Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3" Background="#EDF2F7" Padding="16,6">
+            <Grid>
+                <TextBlock Text="© 2024-2026 西林民高电教处" FontSize="10" Foreground="#718096" VerticalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Right" FontSize="10" Foreground="#718096" VerticalAlignment="Center">
+                    <Run Text="数据目录: "/>
+                    <Run Text="{Binding DataPath, Mode=OneTime}"/>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
